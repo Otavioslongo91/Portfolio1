@@ -24,6 +24,28 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Estrutura para tabela `miniatura` (CRUD de Miniaturas)
+-- categoria: 1 HotWheels Mainline, 2 HotWheels Premium, 3 Matchbox, 4 Outras Marcas
+--
+
+CREATE TABLE `miniatura` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `categoria` tinyint(4) NOT NULL,
+  `quantidade` int(11) NOT NULL,
+  `marca` varchar(60) NOT NULL,
+  `modelo` varchar(100) NOT NULL,
+  `cor` varchar(40) NOT NULL,
+  `ano` smallint(6) NOT NULL,
+  `imagem` mediumblob DEFAULT NULL,
+  `imagem_tipo` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `ck_miniatura_categoria` CHECK (`categoria` between 1 and 4),
+  CONSTRAINT `ck_miniatura_quantidade` CHECK (`quantidade` > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estrutura para tabela `postagem`
 --
 

@@ -1,0 +1,11 @@
+br\edu\ifc\videira\miniaturas\dao\MiniaturaDAO.class
+model\Postagem.class
+br\edu\ifc\videira\miniaturas\controller\ImagemServlet.class
+model\Projeto.class
+controller\ProjetoController.class
+br\edu\ifc\videira\miniaturas\model\Miniatura.class
+br\edu\ifc\videira\miniaturas\util\Conexao.class
+br\edu\ifc\videira\miniaturas\model\Imagem.class
+model\Usuario.class
+br\edu\ifc\videira\miniaturas\controller\MiniaturaServlet.class
+br\edu\ifc\videira\miniaturas\model\Categoria.class
