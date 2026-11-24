@@ -1,19 +1,5 @@
 package br.edu.ifc.videira.miniaturas.controller;
 
-import br.edu.ifc.videira.miniaturas.dao.MiniaturaDAO;
-import br.edu.ifc.videira.miniaturas.model.Categoria;
-import br.edu.ifc.videira.miniaturas.model.Imagem;
-import br.edu.ifc.videira.miniaturas.model.Miniatura;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.MultipartConfig;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.Part;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.Year;
@@ -25,6 +11,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import br.edu.ifc.videira.miniaturas.dao.MiniaturaDAO;
+import br.edu.ifc.videira.miniaturas.model.Categoria;
+import br.edu.ifc.videira.miniaturas.model.Imagem;
+import br.edu.ifc.videira.miniaturas.model.Miniatura;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+
 /**
  * Controller do CRUD.
  *   GET  /miniaturas                  -> READ   (lista as 4 tabelas)
@@ -34,7 +33,7 @@ import java.util.regex.Pattern;
  *   POST acao=excluir                 -> DELETE
  */
 @WebServlet({"/miniaturas", "/miniaturas/"})
-@MultipartConfig(maxFileSize = 2 * 1024 * 1024, maxRequestSize = 3 * 1024 * 1024)
+@MultipartConfig(maxFileSize = 10 * 1024 * 1024, maxRequestSize = 11 * 1024 * 1024)
 public class MiniaturaServlet extends HttpServlet {
 
     private static final String VIEW_LISTA  = "/WEB-INF/views/miniaturas/listar.jsp";
@@ -87,7 +86,7 @@ public class MiniaturaServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Id inválido");
         } catch (IllegalStateException e) { // arquivo maior que o limite do @MultipartConfig
-            flash(req, "erro", "A imagem passou do limite de 2 MB.");
+            flash(req, "erro", "A imagem passou do limite de 10 MB.");
             redirecionar(req, resp);
         } catch (SQLException e) {
             log("Erro de banco de dados", e);
