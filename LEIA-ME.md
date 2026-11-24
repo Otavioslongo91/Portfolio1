@@ -1,42 +1,99 @@
 # CRUD de Miniaturas dentro do Portfolio1
 
-Este pacote NÃO substitui o projeto do professor: ele é acrescentado ao Portfolio1.
-Não há `pom.xml` aqui de propósito: vale o do professor (JSTL, jsp-api e MySQL já estão nele).
+# Portfolio1 — CRUD de Miniaturas
 
-## 1. Pegar o projeto do professor (seu repositório)
-1. Entre em https://github.com/Karli-IFC-Videira/Portfolio1 logado no GitHub e clique em **Fork**.
-2. Clone o SEU fork: `git clone https://github.com/SEU_USUARIO/Portfolio1.git`
+Funcionalidade CRUD (Create, Read, Update, Delete) acrescentada ao projeto **Portfolio1**,
+desenvolvida com **Java, Servlets, JSP e JDBC** seguindo o padrão **MVC**.
 
-## 2. Acrescentar o CRUD
-Copie a pasta `src` deste pacote para dentro da pasta do projeto, mesclando com a `src` existente.
-Nada do professor é sobrescrito: tudo usa nomes novos.
+O CRUD cadastra uma coleção de miniaturas de carros, organizadas em quatro listas:
+HotWheels Mainline, HotWheels Premium, Matchbox e Outras Marcas.
 
-| Novo arquivo | Observação |
+## Funcionalidades
+
+| Operação | O que faz |
 |---|---|
-| `src/main/java/br/edu/ifc/videira/miniaturas/...` | pacote próprio |
-| `src/main/webapp/WEB-INF/views/miniaturas/*.jsp` | pasta própria |
-| `src/main/webapp/css/miniaturas.css` | nome próprio |
-| `sql/miniatura.sql` | tabela nova no banco `portfolio` |
+| **Create** | Cadastra uma miniatura (quantidade, marca, modelo, cor, ano, categoria e imagem) |
+| **Read** | Lista as miniaturas em quatro tabelas, uma por categoria, com a imagem de cada uma |
+| **Update** | Edita os dados, muda a categoria, troca a imagem ou remove a imagem |
+| **Delete** | Exclui a miniatura, com confirmação |
 
-## 3. Ajustar a versão do Java no pom.xml (se o seu JDK for 21)
-O pom do professor pede Java 23. Com JDK 21 o Maven dá "release version 23 not supported".
-Troque 23 por 21 em três lugares: `maven.compiler.release`, `<source>` e `<target>`.
+Validações feitas no servidor:
 
-## 4. Banco
-Rode `sql/miniatura.sql` no phpMyAdmin e cole o conteúdo no final do `portfolio.sql`.
+- Quantidade: número inteiro positivo.
+- Marca e cor: apenas letras.
+- Modelo: obrigatório.
+- Ano: 4 dígitos e não pode ser futuro.
+- Imagem: obrigatória no cadastro; aceita JPEG, PNG, GIF e WebP, com até 2 MB.
 
-## 5. Compilar e publicar
-```
-mvn clean package
-Copy-Item target\Portfolio1.war "C:\Program Files\Apache Software Foundation\Tomcat 11.0\webapps\"   (PowerShell como administrador)
-```
+As mensagens de erro aparecem na própria tela e os campos preenchidos são mantidos.
 
-## 6. Abrir
-http://localhost:8080/Portfolio1/miniaturas
+## Arquitetura (MVC)
 
-## Observações (testado)
-- Endereço: `http://localhost:8080/Portfolio1/miniaturas` (com ou sem barra no final).
-  A raiz `http://localhost:8080/Portfolio1/` dá 404 porque o projeto do professor não tem página inicial.
-- `ProjetoController.java` do professor é um esqueleto que importa `dao.CadastroProjetos`,
-  classe que não existe no projeto. Para compilar, apague a linha `import dao.CadastroProjetos;`.
-- Não commite a pasta `target/`.
+Todos os arquivos novos ficam no pacote `br.edu.ifc.videira.miniaturas`.
+
+| Camada | Arquivo | Responsabilidade |
+|---|---|---|
+| Model | `model/Miniatura.java`, `model/Categoria.java`, `model/Imagem.java` | Dados da miniatura, categorias e imagem |
+| DAO | `dao/MiniaturaDAO.java` | Todo o SQL do CRUD, com `PreparedStatement` |
+| Util | `util/Conexao.java` | Conexão JDBC com o MySQL |
+| Controller | `controller/MiniaturaServlet.java` | Recebe as requisições, valida e chama o DAO |
+| Controller | `controller/ImagemServlet.java` | Entrega a imagem de uma miniatura (`/miniaturas/imagem?id=`) |
+| View | `webapp/WEB-INF/views/miniaturas/listar.jsp` | Formulário de cadastro e as quatro tabelas |
+| View | `webapp/WEB-INF/views/miniaturas/editar.jsp` | Formulário de edição |
+| Estilo | `webapp/css/miniaturas.css` | CSS da aplicação |
+
+O fluxo segue o padrão Post-Redirect-Get: depois de criar, editar ou excluir, o Servlet
+redireciona para a lista, e a mensagem de sucesso aparece uma única vez.
+
+## Tecnologias
+
+Java 17 ou superior, Jakarta Servlet / JSP / JSTL, JDBC, MySQL (MariaDB), Maven,
+Apache Tomcat 11 e CSS.
+
+## Banco de dados
+
+O arquivo `portfolio.sql`, na raiz do repositório, contém o banco completo.
+Além das tabelas do projeto (`usuario`, `postagem` e `project`), ele inclui a tabela `miniatura`:
+
+| Coluna | Tipo | Observação |
+|---|---|---|
+| `id` | INT | Chave primária, auto incremento |
+| `categoria` | TINYINT | 1 Mainline, 2 Premium, 3 Matchbox, 4 Outras (`CHECK` de 1 a 4) |
+| `quantidade` | INT | `CHECK` maior que 0 |
+| `marca`, `modelo`, `cor` | VARCHAR | |
+| `ano` | SMALLINT | |
+| `imagem` | MEDIUMBLOB | Imagem guardada no próprio banco |
+| `imagem_tipo` | VARCHAR(50) | Tipo MIME, por exemplo `image/png` |
+
+## Como executar
+
+**Requisitos:** JDK 17 ou superior, Maven, Tomcat 11 e MySQL (por exemplo, o do XAMPP).
+
+1. Inicie o **MySQL**.
+2. No phpMyAdmin, crie o banco `portfolio` (collation `utf8mb4_general_ci`) e importe o `portfolio.sql`.
+3. Confira o usuário e a senha em `util/Conexao.java` (padrão do XAMPP: usuário `root`, sem senha).
+4. Na raiz do projeto, compile:
+   ```
+   mvn clean package
+   ```
+5. Copie `target/Portfolio1.war` para a pasta `webapps` do Tomcat 11 e inicie o servidor.
+6. Acesse:
+   ```
+   http://localhost:8080/Portfolio1/miniaturas
+   ```
+
+## Alterações feitas no projeto base
+
+- **`pom.xml`:** a versão do Java foi ajustada de 23 para 17, para compilar e rodar em
+  ambientes com JDK ou Tomcat em Java 17 ou 21.
+- **`controller/ProjetoController.java`:** foi removida a linha `import dao.CadastroProjetos;`.
+  A classe não existe no projeto base e impedia a compilação. O restante do arquivo não foi alterado.
+
+## Observações
+
+- As consultas usam `PreparedStatement`, e os dados exibidos nas JSPs são escapados com
+  `<c:out>`, o que evita SQL Injection e XSS.
+- A imagem fica no banco (`MEDIUMBLOB`). Se o MySQL recusar imagens grandes, aumente o
+  `max_allowed_packet` no arquivo `my.ini` do XAMPP.
+- A raiz `http://localhost:8080/Portfolio1/` não tem página inicial, porque o projeto base
+  não define uma. A aplicação é acessada em `/miniaturas`.
